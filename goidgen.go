@@ -103,12 +103,20 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 		chars = g.URL_SAFE
 	}
 
+	// randomly generate random bytes
+	b := make([]byte, length)
+	rand2.Read(b)
+
+	// len of chars as byte
+	len := byte(len(chars))
+
 	// result string builder
 	var builder strings.Builder
+
 	// iterate length times
 	for i := 0; i < length; i++ {
 		// write randomly-drawn byte to builder
-		builder.WriteByte(chars[rand2.Intn(len(chars))])
+		builder.WriteByte(chars[(b[i]/(255/len))%len])
 	}
 
 	// return builder's string
