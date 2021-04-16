@@ -165,7 +165,7 @@ func BenchmarkSecure1(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.Generate(1)
+		_, _ := idgen.Generate(1)
 	}
 }
 
@@ -173,7 +173,7 @@ func BenchmarkSecure10(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.Generate(10)
+		_, _ := idgen.Generate(10)
 	}
 }
 
@@ -181,7 +181,7 @@ func BenchmarkSecure100(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.Generate(100)
+		_, _ := idgen.Generate(100)
 	}
 }
 
@@ -189,7 +189,7 @@ func BenchmarkSecure1000(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.Generate(1_000)
+		_, _ := idgen.Generate(1_000)
 	}
 }
 
@@ -197,7 +197,7 @@ func BenchmarkUnsecure1(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.GenerateUnsecure(1)
+		_, _ := idgen.GenerateUnsecure(1)
 	}
 }
 
@@ -205,7 +205,7 @@ func BenchmarkUnsecure10(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.GenerateUnsecure(10)
+		_, _ := idgen.GenerateUnsecure(10)
 	}
 }
 
@@ -213,7 +213,7 @@ func BenchmarkUnsecure100(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.GenerateUnsecure(100)
+		_, _ := idgen.GenerateUnsecure(100)
 	}
 }
 
@@ -221,6 +221,6 @@ func BenchmarkUnsecure1000(b *testing.B) {
 	idgen := New()
 
 	for n := 0; n < b.N; n++ {
-		idgen.GenerateUnsecure(1_000)
+		_, _ := idgen.GenerateUnsecure(1_000)
 	}
 }
