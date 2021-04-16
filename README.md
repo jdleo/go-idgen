@@ -1,4 +1,4 @@
-# Go Datastrux
+# Go IDGen
 
 [![Build Status](https://github.com/jdleo/go-idgen/workflows/Tests/badge.svg)](https://github.com/jdleo/go-idgen/actions)
 [![Build Status](https://github.com/jdleo/go-idgen/workflows/Lint/badge.svg)](https://github.com/jdleo/go-idgen/actions)
