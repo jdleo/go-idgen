@@ -70,9 +70,9 @@ BenchmarkSecure10-4       	 5277194	     227.4 ns/op
 BenchmarkSecure100-4      	  848889	     1476 ns/op
 BenchmarkSecure1000-4     	   98293	     11972 ns/op
 BenchmarkUnsecure1-4      	26897832	     44.65 ns/op
-BenchmarkUnsecure10-4     	 4651012	     252.8 ns/op
-BenchmarkUnsecure100-4    	  559345	     2198 ns/op
-BenchmarkUnsecure1000-4   	   57820	     21419 ns/op
+BenchmarkUnsecure10-4     	 5969253	     197.6 ns/op
+BenchmarkUnsecure100-4    	 1000000	     1199 ns/op
+BenchmarkUnsecure1000-4   	  118321	     9982 ns/op
 ```
 
 ## Notice
