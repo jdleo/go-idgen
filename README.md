@@ -15,7 +15,55 @@ go get github.com/jdleo/go-idgen
 
 ## Usage
 
-todo
+Generate a cryptographically, secure id.
+By default, it will use `URL_SAFE` charset
+
+```go
+idgen := goidgen.New()
+
+id, err := idgen.Generate(10) // generates random, URL-safe ID of length 10
+id2, err := idgen.Generate(10, idgen.ASCII_LOWERCASE) // generates random, lowercase ID of length 10
+```
+
+Generate a random id.
+By default, it will use `URL_SAFE` charset.
+Not cryptographically secure, uses `math/rand`
+
+```go
+idgen := goidgen.New()
+
+id, err := idgen.GenerateUnsecure(10) // generates random, URL-safe ID of length 10
+id2, err := idgen.GenerateUnsecure(10, idgen.ASCII_LOWERCASE) // generates random, lowercase ID of length 10
+```
+
+## Built-In Charsets
+
+```json
+{
+  "ASCII_LOWERCASE": "abcdefghijklmnopqrstuvwxyz",
+  "ASCII_UPPERCASE": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "ASCII_LETTERS": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "DIGITS": "0123456789",
+  "HEXDIGITS": "0123456789abcdefABCDEF",
+  "OCTDIGITS": "01234567",
+  "PUNCTUATION": "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+  "URL_SAFE": "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "PRINTABLE": "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{\t\n\r\x0b\x0c"
+}
+```
+
+## Benchmarks
+
+```
+BenchmarkSecure1-4        	 2878206	    418.4 ns/op
+BenchmarkSecure10-4       	  486554	    2144 ns/op
+BenchmarkSecure100-4      	   65733	    19002 ns/op
+BenchmarkSecure1000-4     	    4803	    209804 ns/op
+BenchmarkUnsecure1-4      	 5799999	    203.7 ns/op
+BenchmarkUnsecure10-4     	 2776185	    423.2 ns/op
+BenchmarkUnsecure100-4    	  419900	    2654 ns/op
+BenchmarkUnsecure1000-4   	   53046	    22597 ns/op
+```
 
 ## Notice
 
