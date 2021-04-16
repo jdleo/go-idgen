@@ -63,7 +63,8 @@ func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 
 	// randomly generate random bytes
 	b := make([]byte, length)
-	rand.Read(b)
+	x, _ := rand.Read(b)
+	_ = x
 
 	// len of chars as byte
 	len := byte(len(chars))
@@ -105,7 +106,8 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 
 	// randomly generate random bytes
 	b := make([]byte, length)
-	rand2.Read(b)
+	x, _ := rand2.Read(b)
+	_ = x
 
 	// len of chars as byte
 	len := byte(len(chars))
