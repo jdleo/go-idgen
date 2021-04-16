@@ -71,10 +71,10 @@ func TestGenerateCollisions(t *testing.T) {
 func TestGenerateUnsecureCollisionsDefault(t *testing.T) {
 	idgen := New()
 
-	t.Run("IDGen has no collisions when generating 10,000 random strings of length 20", func(t *testing.T) {
+	t.Run("IDGen has no collisions when generating 100,000 random strings of length 20", func(t *testing.T) {
 		seen := map[string]bool{}
 
-		for i := 0; i < 10_000; i++ {
+		for i := 0; i < 100_000; i++ {
 			id, _ := idgen.GenerateUnsecure(20)
 
 			if _, ok := seen[id]; ok {
@@ -90,10 +90,10 @@ func TestGenerateUnsecureCollisionsDefault(t *testing.T) {
 func TestGenerateUnsecureCollisions(t *testing.T) {
 	idgen := New()
 
-	t.Run("IDGen has no collisions when generating 10,000 random strings of length 20", func(t *testing.T) {
+	t.Run("IDGen has no collisions when generating 100,000 random strings of length 20", func(t *testing.T) {
 		seen := map[string]bool{}
 
-		for i := 0; i < 10_000; i++ {
+		for i := 0; i < 100_000; i++ {
 			id, _ := idgen.GenerateUnsecure(20, idgen.ASCII_LETTERS)
 
 			if _, ok := seen[id]; ok {
