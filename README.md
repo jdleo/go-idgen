@@ -1,11 +1,13 @@
 # Go IDGen
 
-[![Build Status](https://github.com/jdleo/go-idgen/workflows/Tests/badge.svg)](https://github.com/jdleo/go-idgen/actions)
-[![Build Status](https://github.com/jdleo/go-idgen/workflows/Lint/badge.svg)](https://github.com/jdleo/go-idgen/actions)
+[![Go Report](https://goreportcard.com/badge/github.com/jdleo/go-idgen)](https://goreportcard.com/report/github.com/jdleo/go-idgen)
+[![Go Coverage](https://gocover.io/_badge/github.com/jdleo/go-idgen)](https://gocover.io/github.com/jdleo/go-idgen)
+[![Test Status](https://github.com/jdleo/go-idgen/workflows/Tests/badge.svg)](https://github.com/jdleo/go-idgen/actions)
+[![Lint Status](https://github.com/jdleo/go-idgen/workflows/Lint/badge.svg)](https://github.com/jdleo/go-idgen/actions)
 [![GitHub issues](https://img.shields.io/github/issues/jdleo/go-idgen.svg)](https://github.com/jdleo/go-idgen/issues)
 [![License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://github.com/jdleo/go-idgen/actions/LICENSE)
 
-todo
+IDGen is a cryptographically secure, URL-safe by default, ID generator. You can specify length, and get an ID quickly generated for you. You can also opt out of using crypto number generation to get quicker number generation.
 
 ## Install
 
