@@ -1,6 +1,7 @@
 package goidgen
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -137,7 +138,7 @@ func TestGenerateThrowsErrorOnBigAlphabet(t *testing.T) {
 	}
 
 	t.Run("Generate should throw an error on big alphabet (>= 255 chars)", func(t *testing.T) {
-		_, err := idgen.Generate(-1, alphabet)
+		_, err := idgen.Generate(10, strings.Repeat("_", 300))
 
 		if err == nil {
 			t.Errorf("expected valid error, received nil")
@@ -147,13 +148,9 @@ func TestGenerateThrowsErrorOnBigAlphabet(t *testing.T) {
 
 func TestGenerateUnsecureThrowsErrorOnBigAlphabet(t *testing.T) {
 	idgen := New()
-	alphabet := ""
-	for i := 0; i < 300; i++ {
-		alphabet += "_"
-	}
 
 	t.Run("Generate should throw an error on big alphabet (>= 255 chars)", func(t *testing.T) {
-		_, err := idgen.GenerateUnsecure(-1, alphabet)
+		_, err := idgen.GenerateUnsecure(10, strings.Repeat("_", 300))
 
 		if err == nil {
 			t.Errorf("expected valid error, received nil")
