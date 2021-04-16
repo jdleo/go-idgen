@@ -9,10 +9,8 @@ todo
 
 ## Install
 
-Via go get tool
-
 ```bash
-$ go get github.com/jdleo/go-idgen
+go get github.com/jdleo/go-idgen
 ```
 
 ## Usage
