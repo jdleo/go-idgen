@@ -3,7 +3,6 @@ package goidgen
 import (
 	"crypto/rand"
 	"errors"
-	"math/big"
 	rand2 "math/rand"
 	"strings"
 	"time"
@@ -51,24 +50,30 @@ func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 	}
 
 	// establish char set to be used
-	var chars []rune
+	var chars string
 
 	// check if an alphabet was provided
 	if len(alphabet) > 0 {
-		// use alphabet, as rune slice
-		chars = []rune(alphabet[0])
+		// use provided alphabet
+		chars = alphabet[0]
 	} else {
-		// use url_safe characters, as rune slice
-		chars = []rune(g.URL_SAFE)
+		// use url_safe characters
+		chars = g.URL_SAFE
 	}
 
-	// result string builder
+	// randomly generate random bytes
+	b := make([]byte, length)
+	rand.Read(b)
+
+	// len of chars as byte
+	len := byte(len(chars))
+
+	// result string builder with preallocated buffer size
 	var builder strings.Builder
 	// iterate length times
 	for i := 0; i < length; i++ {
-		// write randomly-drawn rune to builder
-		nBig, _ := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
-		builder.WriteRune(chars[nBig.Int64()])
+		// write randomly-drawn byte to builder
+		builder.WriteByte(chars[(b[i]/(255/len))%len])
 	}
 
 	// return builder's string
@@ -87,23 +92,31 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 	}
 
 	// establish char set to be used
-	var chars []rune
+	var chars string
 
 	// check if an alphabet was provided
 	if len(alphabet) > 0 {
-		// use alphabet, as rune slice
-		chars = []rune(alphabet[0])
+		// use provided alphabet
+		chars = alphabet[0]
 	} else {
-		// use url_safe characters, as rune slice
-		chars = []rune(g.URL_SAFE)
+		// use url_safe characters
+		chars = g.URL_SAFE
 	}
+
+	// randomly generate random bytes
+	b := make([]byte, length)
+	rand2.Read(b)
+
+	// len of chars as byte
+	len := byte(len(chars))
 
 	// result string builder
 	var builder strings.Builder
+
 	// iterate length times
 	for i := 0; i < length; i++ {
-		// write randomly-drawn rune to builder
-		builder.WriteRune(chars[rand2.Intn(len(chars))])
+		// write randomly-drawn byte to builder
+		builder.WriteByte(chars[(b[i]/(255/len))%len])
 	}
 
 	// return builder's string
