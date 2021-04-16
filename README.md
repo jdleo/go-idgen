@@ -17,6 +17,14 @@ go get github.com/jdleo/go-idgen
 
 ## Usage
 
+Import
+
+```go
+import (
+	goidgen "github.com/jdleo/go-idgen"
+)
+```
+
 Generate a cryptographically, secure id.
 By default, it will use `URL_SAFE` charset
 
