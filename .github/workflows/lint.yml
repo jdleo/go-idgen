@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Run golangci-lint
-        uses: actions-contrib/golangci-lint@v1
+        uses: golangci/golangci-lint-action@v2
