@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"errors"
 	rand2 "math/rand"
-	"strings"
 	"time"
 )
 
@@ -21,7 +20,7 @@ type goidgen struct {
 	PRINTABLE       string
 }
 
-// constructor for a new goidgen instance
+// New returns a new goidgen instance
 func New() goidgen {
 	// seed random
 	rand2.Seed(time.Now().UTC().UnixNano())
@@ -40,7 +39,7 @@ func New() goidgen {
 }
 
 // Generate generates secure, random ID's
-// Accepts optional parameter - alphabet to use for ID generation. If ommitted, it will default to URL-safe characters
+// Accepts optional parameter - alphabet to use for ID generation. If omitted, it will default to URL-safe characters
 func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 	// error checking
 	if length <= 0 {
@@ -69,21 +68,22 @@ func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 	// len of chars as byte
 	len := byte(len(chars))
 
-	// result string builder with preallocated buffer size
-	var builder strings.Builder
+	// result byte buffer
+	result := make([]byte, length)
+
 	// iterate length times
 	for i := 0; i < length; i++ {
 		// write randomly-drawn byte to builder
-		builder.WriteByte(chars[(b[i]/(255/len))%len])
+		result[i] = chars[(b[i]/(255/len))%len]
 	}
 
 	// return builder's string
-	return builder.String(), nil
+	return string(result), nil
 }
 
 // Generate generates unsecure, random ID's
 // "Unsecure" refers to math/rand being used for RNG rather than a crypto-safe solution
-// Accepts optional parameter - alphabet to use for ID generation. If ommitted, it will default to URL-safe characters
+// Accepts optional parameter - alphabet to use for ID generation. If omitted, it will default to URL-safe characters
 func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, error) {
 	// error checking
 	if length <= 0 {
@@ -112,15 +112,15 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 	// len of chars as byte
 	len := byte(len(chars))
 
-	// result string builder
-	var builder strings.Builder
+	// result byte buffer
+	result := make([]byte, length)
 
 	// iterate length times
 	for i := 0; i < length; i++ {
 		// write randomly-drawn byte to builder
-		builder.WriteByte(chars[(b[i]/(255/len))%len])
+		result[i] = chars[(b[i]/(255/len))%len]
 	}
 
 	// return builder's string
-	return builder.String(), nil
+	return string(result), nil
 }
