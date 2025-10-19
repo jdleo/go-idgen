@@ -3,12 +3,26 @@ package goidgen
 import (
 	"crypto/rand"
 	"errors"
-	rand2 "math/rand"
-	"time"
+	rand2 "math/rand/v2"
 )
 
-// properties for a goidgen instance
-type goidgen struct {
+// Character set constants for ID generation
+const (
+	ASCIILowercase = "abcdefghijklmnopqrstuvwxyz"
+	ASCIIUppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	ASCIILetters   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	Digits         = "0123456789"
+	HexDigits      = "0123456789abcdefABCDEF"
+	OctDigits      = "01234567"
+	Punctuation    = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+	URLSafe        = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	Printable      = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c"
+)
+
+// IDGen provides methods for generating random IDs
+type IDGen struct {
+	// Deprecated: Use package constants instead (ASCIILowercase, ASCIIUppercase, etc.)
+	// These fields are kept for backward compatibility
 	ASCII_LOWERCASE string
 	ASCII_UPPERCASE string
 	ASCII_LETTERS   string
@@ -20,32 +34,29 @@ type goidgen struct {
 	PRINTABLE       string
 }
 
-// New returns a new goidgen instance
-func New() goidgen {
-	// seed random
-	rand2.Seed(time.Now().UTC().UnixNano())
-	// fill fields with predefined character sets
-	return goidgen{
-		ASCII_LOWERCASE: "abcdefghijklmnopqrstuvwxyz",
-		ASCII_UPPERCASE: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		ASCII_LETTERS:   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		DIGITS:          "0123456789",
-		HEXDIGITS:       "0123456789abcdefABCDEF",
-		OCTDIGITS:       "01234567",
-		PUNCTUATION:     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-		URL_SAFE:        "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		PRINTABLE:       "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c",
+// New returns a new IDGen instance
+// Note: This creates an instance for backward compatibility, but the package-level
+// constants (ASCIILowercase, Digits, etc.) are preferred for better performance
+func New() IDGen {
+	return IDGen{
+		ASCII_LOWERCASE: ASCIILowercase,
+		ASCII_UPPERCASE: ASCIIUppercase,
+		ASCII_LETTERS:   ASCIILetters,
+		DIGITS:          Digits,
+		HEXDIGITS:       HexDigits,
+		OCTDIGITS:       OctDigits,
+		PUNCTUATION:     Punctuation,
+		URL_SAFE:        URLSafe,
+		PRINTABLE:       Printable,
 	}
 }
 
-// Generate generates secure, random ID's
+// Generate generates cryptographically secure, random IDs using crypto/rand
 // Accepts optional parameter - alphabet to use for ID generation. If omitted, it will default to URL-safe characters
-func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
+func (g *IDGen) Generate(length int, alphabet ...string) (string, error) {
 	// error checking
 	if length <= 0 {
-		return "", errors.New("length must be >= 0")
-	} else if len(alphabet) > 0 && len(alphabet[0]) > 255 {
-		return "", errors.New("alphabet size must be <= 255 characters")
+		return "", errors.New("length must be > 0")
 	}
 
 	// establish char set to be used
@@ -53,43 +64,101 @@ func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 
 	// check if an alphabet was provided
 	if len(alphabet) > 0 {
-		// use provided alphabet
 		chars = alphabet[0]
+		if len(chars) == 0 {
+			return "", errors.New("alphabet cannot be empty")
+		}
+		if len(chars) > 255 {
+			return "", errors.New("alphabet size must be <= 255 characters")
+		}
 	} else {
-		// use url_safe characters
-		chars = g.URL_SAFE
+		// use url_safe characters (backward compat with struct field)
+		if g.URL_SAFE != "" {
+			chars = g.URL_SAFE
+		} else {
+			chars = URLSafe
+		}
 	}
 
-	// randomly generate random bytes
-	b := make([]byte, length)
-	x, _ := rand.Read(b)
-	_ = x
+	charsLen := len(chars)
 
-	// len of chars as byte
-	len := byte(len(chars))
+	// Fast path for power-of-2 alphabets (no rejection needed)
+	if charsLen&(charsLen-1) == 0 {
+		return generatePowerOfTwo(chars, charsLen, length)
+	}
 
-	// result byte buffer
+	// Calculate the mask for rejection sampling
+	mask := 1
+	for mask < charsLen {
+		mask <<= 1
+	}
+	mask--
+
+	// Pre-allocate result
 	result := make([]byte, length)
 
-	// iterate length times
-	for i := 0; i < length; i++ {
-		// write randomly-drawn byte to builder
-		result[i] = chars[(b[i]/(255/len))%len]
+	// Batch read random bytes - allocate generously to minimize rejection overhead
+	bufSize := length + (length >> 1) // 1.5x length
+	if bufSize < 32 {
+		bufSize = 32
+	}
+	randomBytes := make([]byte, bufSize)
+	if _, err := rand.Read(randomBytes); err != nil {
+		return "", err
 	}
 
-	// return builder's string
+	resultIdx := 0
+	byteIdx := 0
+
+	// Rejection sampling loop
+	for resultIdx < length {
+		// Refill buffer if needed
+		if byteIdx >= len(randomBytes) {
+			if _, err := rand.Read(randomBytes); err != nil {
+				return "", err
+			}
+			byteIdx = 0
+		}
+
+		// Process byte
+		b := int(randomBytes[byteIdx]) & mask
+		byteIdx++
+
+		if b < charsLen {
+			result[resultIdx] = chars[b]
+			resultIdx++
+		}
+	}
+
 	return string(result), nil
 }
 
-// Generate generates unsecure, random ID's
+// generatePowerOfTwo is optimized for alphabets with power-of-2 lengths (no rejection needed)
+func generatePowerOfTwo(chars string, charsLen, length int) (string, error) {
+	result := make([]byte, length)
+
+	// Read random bytes directly
+	if _, err := rand.Read(result); err != nil {
+		return "", err
+	}
+
+	// Simple mask, no rejection needed
+	mask := byte(charsLen - 1)
+	for i := 0; i < length; i++ {
+		result[i] = chars[result[i]&mask]
+	}
+
+	return string(result), nil
+}
+
+// GenerateUnsecure generates unsecure, random IDs using math/rand
 // "Unsecure" refers to math/rand being used for RNG rather than a crypto-safe solution
+// This is faster but should not be used for security-sensitive applications
 // Accepts optional parameter - alphabet to use for ID generation. If omitted, it will default to URL-safe characters
-func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, error) {
+func (g *IDGen) GenerateUnsecure(length int, alphabet ...string) (string, error) {
 	// error checking
 	if length <= 0 {
-		return "", errors.New("length must be >= 0")
-	} else if len(alphabet) > 0 && len(alphabet[0]) > 255 {
-		return "", errors.New("alphabet size must be <= 255 characters")
+		return "", errors.New("length must be > 0")
 	}
 
 	// establish char set to be used
@@ -97,30 +166,30 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 
 	// check if an alphabet was provided
 	if len(alphabet) > 0 {
-		// use provided alphabet
 		chars = alphabet[0]
+		if len(chars) == 0 {
+			return "", errors.New("alphabet cannot be empty")
+		}
+		if len(chars) > 255 {
+			return "", errors.New("alphabet size must be <= 255 characters")
+		}
 	} else {
-		// use url_safe characters
-		chars = g.URL_SAFE
+		// use url_safe characters (backward compat with struct field)
+		if g.URL_SAFE != "" {
+			chars = g.URL_SAFE
+		} else {
+			chars = URLSafe
+		}
 	}
-
-	// randomly generate random bytes
-	b := make([]byte, length)
-	x, _ := rand2.Read(b)
-	_ = x
-
-	// len of chars as byte
-	len := byte(len(chars))
 
 	// result byte buffer
 	result := make([]byte, length)
+	charsLen := len(chars)
 
-	// iterate length times
+	// Use math/rand/v2 (automatically seeded, no bias with IntN)
 	for i := 0; i < length; i++ {
-		// write randomly-drawn byte to builder
-		result[i] = chars[(b[i]/(255/len))%len]
+		result[i] = chars[rand2.IntN(charsLen)]
 	}
 
-	// return builder's string
 	return string(result), nil
 }
