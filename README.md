@@ -1,7 +1,7 @@
 # Go IDGen
 
 [![Go Report](https://goreportcard.com/badge/github.com/jdleo/go-idgen)](https://goreportcard.com/report/github.com/jdleo/go-idgen)
-[![Go Coverage](https://gocover.io/_badge/github.com/jdleo/go-idgen)](https://gocover.io/github.com/jdleo/go-idgen)
+[![Go Coverage](https://github.com/jdleo/go-idgen/wiki/coverage.svg)](https://raw.githack.com/wiki/jdleo/go-idgen/coverage.html)
 [![Test Status](https://github.com/jdleo/go-idgen/workflows/Tests/badge.svg)](https://github.com/jdleo/go-idgen/actions)
 [![Lint Status](https://github.com/jdleo/go-idgen/workflows/Lint/badge.svg)](https://github.com/jdleo/go-idgen/actions)
 [![GitHub issues](https://img.shields.io/github/issues/jdleo/go-idgen.svg)](https://github.com/jdleo/go-idgen/issues)
