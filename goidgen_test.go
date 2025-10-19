@@ -164,7 +164,7 @@ func BenchmarkSecure1(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.Generate(1)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -175,7 +175,7 @@ func BenchmarkSecure10(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.Generate(10)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -186,7 +186,7 @@ func BenchmarkSecure100(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.Generate(100)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -197,7 +197,7 @@ func BenchmarkSecure1000(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.Generate(1_000)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -208,7 +208,7 @@ func BenchmarkUnsecure1(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.GenerateUnsecure(1)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -219,7 +219,7 @@ func BenchmarkUnsecure10(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.GenerateUnsecure(10)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -230,7 +230,7 @@ func BenchmarkUnsecure100(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.GenerateUnsecure(100)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
@@ -241,7 +241,7 @@ func BenchmarkUnsecure1000(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := idgen.GenerateUnsecure(1_000)
 		if err != nil {
-			b.Errorf(err.Error())
+			b.Error(err)
 		}
 	}
 }
