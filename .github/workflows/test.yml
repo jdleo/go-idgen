@@ -5,10 +5,10 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.15.2
-      - uses: actions/checkout@v1
+          go-version: 1.22
+      - uses: actions/checkout@v4
       - name: Test
         run: make test
       - name: Update coverage report
@@ -19,10 +19,10 @@ jobs:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.15.2
+          go-version: 1.22
         id: go
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Benchmark
         run: make bench
