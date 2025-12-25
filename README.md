@@ -64,16 +64,16 @@ id2, err := idgen.GenerateUnsecure(10, idgen.ASCII_LOWERCASE) // generates rando
 
 ## Benchmarks
 
-```
-BenchmarkSecure1-4        	12947458	     87.39 ns/op
-BenchmarkSecure10-4       	 5277194	     227.4 ns/op
-BenchmarkSecure100-4      	  848889	     1476 ns/op
-BenchmarkSecure1000-4     	   98293	     11972 ns/op
-BenchmarkUnsecure1-4      	26897832	     44.65 ns/op
-BenchmarkUnsecure10-4     	 5969253	     197.6 ns/op
-BenchmarkUnsecure100-4    	 1000000	     1199 ns/op
-BenchmarkUnsecure1000-4   	  118321	     9982 ns/op
-```
+| Benchmark    | Old (ns/op) | New (ns/op) | Speedup | Improvement |
+|:-------------|------------:|------------:|:--------|:------------|
+| Secure1      |      630.00 |      618.70 | 1.02x   | 1.79%       |
+| Secure10     |      691.80 |      646.60 | 1.07x   | 6.53%       |
+| Secure100    |     1052.00 |      885.70 | 1.19x   | 15.81%      |
+| Secure1000   |     5377.00 |     3791.00 | 1.42x   | 29.50%      |
+| Unsecure1    |       23.42 |       16.05 | 1.46x   | 31.47%      |
+| Unsecure10   |       62.24 |       35.16 | 1.77x   | 43.51%      |
+| Unsecure100  |      310.20 |      140.80 | 2.20x   | 54.61%      |
+| Unsecure1000 |     2732.00 |     1135.00 | 2.41x   | 58.46%      |
 
 ## Notice
 
