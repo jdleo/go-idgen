@@ -107,10 +107,17 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 			i++
 		}
 	} else {
-		// Generic path using rand.Read for simplicity on non-standard lengths
-		rand2.Read(b)
-		for i := 0; i < length; i++ {
-			b[i] = chars[int(b[i])%l]
+		// Generic path (switched from rand.Read to Int63 batching to avoid deprecation and improve speed)
+		// We extract 7 random bytes (56 bits) from each 63-bit random integer
+		for i, cache, remain := 0, rand2.Int63(), 7; i < length; {
+			if remain == 0 {
+				cache, remain = rand2.Int63(), 7
+			}
+			// use lowest 8 bits for random byte, then modulo length
+			b[i] = chars[int(cache&0xff)%l]
+			cache >>= 8
+			remain--
+			i++
 		}
 	}
 
