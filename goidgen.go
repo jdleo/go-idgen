@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"errors"
 	rand2 "math/rand"
-	"time"
 )
 
 // properties for a goidgen instance
@@ -22,8 +21,6 @@ type goidgen struct {
 
 // New returns a new goidgen instance
 func New() goidgen {
-	// seed random
-	rand2.Seed(time.Now().UTC().UnixNano())
 	// fill fields with predefined character sets
 	return goidgen{
 		ASCII_LOWERCASE: "abcdefghijklmnopqrstuvwxyz",
@@ -49,36 +46,31 @@ func (g *goidgen) Generate(length int, alphabet ...string) (string, error) {
 	}
 
 	// establish char set to be used
-	var chars string
-
-	// check if an alphabet was provided
+	chars := g.URL_SAFE
 	if len(alphabet) > 0 {
-		// use provided alphabet
 		chars = alphabet[0]
-	} else {
-		// use url_safe characters
-		chars = g.URL_SAFE
 	}
 
-	// randomly generate random bytes
 	b := make([]byte, length)
-	x, _ := rand.Read(b)
-	_ = x
-
-	// len of chars as byte
-	len := byte(len(chars))
-
-	// result byte buffer
-	result := make([]byte, length)
-
-	// iterate length times
-	for i := 0; i < length; i++ {
-		// write randomly-drawn byte to builder
-		result[i] = chars[(b[i]/(255/len))%len]
+	if _, err := rand.Read(b); err != nil {
+		return "", err
 	}
 
-	// return builder's string
-	return string(result), nil
+	l := len(chars)
+	if l == 64 {
+		// Optimization: If length is 64, we can use bitmasking (mostly for URL_SAFE)
+		// This is significantly faster than modulo.
+		for i := 0; i < length; i++ {
+			b[i] = chars[b[i]&63]
+		}
+	} else {
+		// Generic path
+		for i := 0; i < length; i++ {
+			b[i] = chars[int(b[i])%l]
+		}
+	}
+
+	return string(b), nil
 }
 
 // Generate generates unsecure, random ID's
@@ -93,34 +85,34 @@ func (g *goidgen) GenerateUnsecure(length int, alphabet ...string) (string, erro
 	}
 
 	// establish char set to be used
-	var chars string
-
-	// check if an alphabet was provided
+	chars := g.URL_SAFE
 	if len(alphabet) > 0 {
-		// use provided alphabet
 		chars = alphabet[0]
-	} else {
-		// use url_safe characters
-		chars = g.URL_SAFE
 	}
 
-	// randomly generate random bytes
 	b := make([]byte, length)
-	x, _ := rand2.Read(b)
-	_ = x
+	l := len(chars)
 
-	// len of chars as byte
-	len := byte(len(chars))
-
-	// result byte buffer
-	result := make([]byte, length)
-
-	// iterate length times
-	for i := 0; i < length; i++ {
-		// write randomly-drawn byte to builder
-		result[i] = chars[(b[i]/(255/len))%len]
+	if l == 64 {
+		// Optimized path for 64-char alphabet (default)
+		// Uses 63-bit random integers to process 10 characters per call
+		// avoiding overhead of rand.Read or byte-by-byte calls.
+		for i, cache, remain := 0, rand2.Int63(), 10; i < length; {
+			if remain == 0 {
+				cache, remain = rand2.Int63(), 10
+			}
+			b[i] = chars[int(cache&63)]
+			cache >>= 6
+			remain--
+			i++
+		}
+	} else {
+		// Generic path using rand.Read for simplicity on non-standard lengths
+		rand2.Read(b)
+		for i := 0; i < length; i++ {
+			b[i] = chars[int(b[i])%l]
+		}
 	}
 
-	// return builder's string
-	return string(result), nil
+	return string(b), nil
 }
